@@ -167,3 +167,79 @@ class PokemonList {
       console.log(" Nom:" + pokemon.name + " Tipus:" + pokemon.types[0] + " Imatge:" + pokemon.sprites);
     }
   }
+
+
+
+
+
+  //PAS 3:
+  // 3. Funciones flecha
+
+  // Añadir múltiples Pokémon a la vez
+  addMultiplePokemons = (...pokemons) => {
+    pokemons.forEach(pokemon => this.addPokemon(pokemon));
+  };
+
+  // Obtener Pokémon dentro de un rango de peso
+  getPokemonsByWeightRange = (minWeight, maxWeight) => {
+    return this._pokemons.filter(pokemon =>
+      pokemon.weight >= minWeight && pokemon.weight <= maxWeight
+    );
+  };
+
+  // Ordenar Pokémon por experiencia base
+  // CAMBIO: no ordenamos en el mismo array (sort muta). Ordenamos una copia y sustituimos.
+  sortPokemonsByBaseExperience = () => {
+    const sortedCopy = [...this._pokemons].sort((a, b) => a.baseExperience - b.baseExperience);
+    this._pokemons = sortedCopy; // reemplazamos por la copia ordenada (sin mutar el array original)
+    console.log("Pokemons ordenats segons l'experiència base.");
+  };
+}
+
+//PAS 4:
+// 4. Función recursiva para buscar un Pokémon por ID
+function findPokemonById(pokemonList, id, index = 0) {
+  if (index >= pokemonList._pokemons.length) {
+    return null;
+  }
+  if (pokemonList._pokemons[index].id === id) {
+    return pokemonList._pokemons[index];
+  }
+  return findPokemonById(pokemonList, id, index + 1);
+}
+
+//PAS 5:
+// 5. Uso de reduce para encontrar el tipo más común
+function getMostCommonType(pokemonList) {
+  const tipusComptats = pokemonList._pokemons.reduce((contador, pokemon) => {
+    pokemon.types.forEach(type => {
+      if (contador[type]) {
+        contador[type] = contador[type] + 1;
+      } else {
+        contador[type] = 1;
+      }
+    });
+    return contador;
+  }, {});
+
+  let tipusMesComu = null;
+  let numeroMesAlt = 0;
+  for (let type in tipusComptats) {
+    if (tipusComptats[type] > numeroMesAlt) {
+      numeroMesAlt = tipusComptats[type];
+      tipusMesComu = type;
+    }
+  }
+  return tipusMesComu;
+}
+
+//PAS 6:
+// 6. Uso de map y filter para obtener Pokémon fuertes por ataque
+function getStrongPokemons(pokemons, minAttack) {
+  const filtrats = pokemons.filter(pokemon => {
+    const atac = pokemon.stats.find(stat => stat.name === "attack").value;
+    return atac >= minAttack;
+  });
+  const noms = filtrats.map(pokemon => pokemon.name);
+  return noms;
+}
