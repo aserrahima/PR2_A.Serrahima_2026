@@ -29,25 +29,103 @@ function getPokemonById(id) {
   return pokemons.find(p => Number(p.id) === Number(id)) || null;
 }
 
+// Usuari logejat
+function getCurrentUser() {
+  return loadFromStorage("currentUser", null);
+}
+
+function saveCurrentUser(user) {
+  localStorage.setItem("currentUser", JSON.stringify(user));
+}
+
+// Assegurem que existeixin les llistes
+function ensureUserLists(user) {
+  if (!user.lists) user.lists = {};
+  if (!Array.isArray(user.lists.myTeam)) user.lists.myTeam = [];
+  if (!Array.isArray(user.lists.wishes)) user.lists.wishes = [];
+  return user;
+}
+
+// Afegim a "myTeam" o "wishes"
+function addPokemonToList(listType, pokemonId) {
+  let user = getCurrentUser();
+  if (!user) {
+    alert("Has d'iniciar sessió per afegir pokémons.");
+    return;
+  }
+
+  user = ensureUserLists(user);
+
+  const idNum = Number(pokemonId);
+  if (!user.lists[listType].includes(idNum)) {
+    user.lists[listType].push(idNum);
+    saveCurrentUser(user);
+    alert("Afegit correctament!");
+  } else {
+    alert("Aquest Pokémon ja hi és.");
+  }
+
+  // Al tenir menu.js carregat, actualitzem comptadors
+  if (typeof updateMenu === "function") updateMenu();
+}
+
+
 //Tipus "render" per pintar a la pantalla
 // Posem les dades del Pokémon dins del HTML. 
 
-IMPORTANT: aquests IDs han d'existir al teu detail.html
-*/
-function renderPokemonDetail(pokemon) {
-  document.getElementById("pokemonName").textContent = pokemon.name;
-  document.getElementById("pokemonImage").src = pokemon.sprites;
-  document.getElementById("pokemonImage").alt = pokemon.name;
 
-  document.getElementById("pokemonDescription").textContent = pokemon.description || "Sense descripció";
-  document.getElementById("pokemonTypes").textContent = (pokemon.types || []).join(", ");
+function renderPokemonDetail(pokemon) {
+  // Eliminem el "Cargando..." (buidant el contenidor)
+  const container = document.getElementById("pokemonDetail");
+  if (container) container.querySelector("p")?.remove();
+
+  document.getElementById("title").textContent = pokemon.name;
+  document.getElementById("img").src = pokemon.sprites;
+  document.getElementById("img").alt = pokemon.name;
+
+  document.getElementById("desc").textContent = pokemon.description || "Descripció no disponible";
+
+  // Meta (tipus, height, weight, exp...)
+  const metaUl = document.getElementById("meta");
+  metaUl.innerHTML = "";
+
+  const metaItems = [
+    `Tipus: ${(pokemon.types || []).join(", ")}`,
+    `Alçada: ${pokemon.height}`,
+    `Pes: ${pokemon.weight}`,
+    `Experiència base: ${pokemon.baseExperience}`
+  ];
+
+  metaItems.forEach(text => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    metaUl.appendChild(li);
+  });
+
+  // Stats
+  const statsUl = document.getElementById("stats");
+  statsUl.innerHTML = "";
+
+  (pokemon.stats || []).forEach(s => {
+    const li = document.createElement("li");
+    li.textContent = `${s.name}: ${s.value}`;
+    statsUl.appendChild(li);
+  });
+
+  // Botons
+  document.getElementById("btnTeam").addEventListener("click", () => {
+    addPokemonToList("myTeam", pokemon.id);
+  });
+
+  document.getElementById("btnWish").addEventListener("click", () => {
+    addPokemonToList("wishes", pokemon.id);
+  });
 }
 
-// Inici de la pàgina
 function initDetailPage() {
-  const id = getQueryParam("id");
+  const id = getPokemonIdFromUrl();
   if (!id) {
-    console.error("Falta el paràmetre id a la URL.");
+    console.error("Falta l'id a la URL. Exemple: detail.html?id=25");
     return;
   }
 
@@ -58,6 +136,14 @@ function initDetailPage() {
   }
 
   renderPokemonDetail(pokemon);
+
+  // Botó tornar (els dos existeixen al teu HTML, però usem el visible)
+  const backButton = document.getElementById("backButton");
+  if (backButton) {
+    backButton.addEventListener("click", () => {
+      window.location.href = "indice.html";
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initDetailPage);
