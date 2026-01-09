@@ -48,6 +48,30 @@
         <button id="backButton">Volver a la Lista de Pokemons</button>
     </div>
 
+
+    <!-- Menú alternatiu (si algun JS el necessita) -->
+    <nav id="menu" class="menu hidden" aria-hidden="true">
+        <a href="./pokemons.html">Pokémons</a>
+        <a href="./listas.html">Llistes (Equip: <span id="teamCount">0</span> | Desitjos: <span id="wishCount">0</span>)</a>
+        <span class="spacer"></span>
+        <div class="userbox">
+            <span id="menuUser"></span>
+            <button id="btnLogout">Logout</button>
+        </div>
+    </nav>
+
+    //AFEGIT: Controls alternatius per veure equip/desitjos i indicador de llista actual
+    <div class="row hidden" aria-hidden="true">
+        <button id="btnTeam" type="button">Veure equip</button>
+        <button id="btnWish" type="button">Veure desitjos</button>
+        <span class="spacer"></span>
+        <strong id="currentList"></strong>
+    </div>
+
+    //AFEGIT: Contenidor alternatiu, per minimitzar errors (per si acàs)
+    <section id="listContainer" class="card hidden" aria-hidden="true"></section>
+
+    
     <script src="../js/config.js"></script>
     <script src="../js/clases.js"></script>
     <script src="../js/menu.js"></script>
