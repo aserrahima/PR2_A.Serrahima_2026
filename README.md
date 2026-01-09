@@ -4,7 +4,7 @@
 <html lang="ca">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="refresh" content="0; url=HTML/index.html">
+  <meta http-equiv="refresh" content="0; url=html/index.html">
   <title>PR2</title>
 </head>
 <body>
